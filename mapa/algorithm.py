@@ -455,8 +455,12 @@ def compute_all_triangles(
     raster = _create_raster(array, max_x, max_y)
 
     x_scale, y_scale = desired_size.x / max_x, desired_size.y / max_y
+    log.info("input z_offset: ", z_offset)
+    log.info("raster.min(): ", raster.min())
+    log.info("elevation_scale: ", elevation_scale)
     z_offset = _determine_z_offset(z_offset, raster.min(), elevation_scale)
-    log.debug("raster.min: ", raster.min())
+    log.info("determined z_offset: ", z_offset)
+    
     combined_z_scale = elevation_scale * z_scale
 
     # compute triangles for 3d surface, sides and bottom
