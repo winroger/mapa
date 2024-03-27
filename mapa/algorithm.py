@@ -434,7 +434,7 @@ def _compute_triangles_of_bottom(max_x: int, max_y: int, x_scale: float, y_scale
 def _determine_z_offset(z_offset: Union[None, float], minimum: float, elevation_scale: float) -> float:
     if z_offset is None:
         # using the natural height, i.e. islands will have an z_offset of ~0 and mountains will have a larger z_offset
-        return minimum # * elevation_scale
+        return minimum * elevation_scale
     else:
         if z_offset < 0:
             log.warning("☝️  Warning: Be careful using negative z_offsets, as it might break your 3D model.")
@@ -455,11 +455,7 @@ def compute_all_triangles(
     raster = _create_raster(array, max_x, max_y)
 
     x_scale, y_scale = desired_size.x / max_x, desired_size.y / max_y
-    log.info("input z_offset: ", z_offset)
-    log.info("raster.min(): ", raster.min())
-    log.info("elevation_scale: ", elevation_scale)
     z_offset = _determine_z_offset(z_offset, raster.min(), elevation_scale)
-    log.info("determined z_offset: ", z_offset)
     
     combined_z_scale = elevation_scale * z_scale
 
