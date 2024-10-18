@@ -1,37 +1,21 @@
-import logging
-from pathlib import Path
-from typing import List, Union
-from urllib import request
+from pystac import Item
+from datetime import datetime
+from mapa import convert_bbox_to_stl
 
-import geojson
-from pystac.item import Item
-from pystac_client import Client
-
-from mapa import conf
-from mapa.exceptions import NoSTACItemFound
-from mapa.utils import ProgressBar
-
-log = logging.getLogger(__name__)
+"""
+example output: ALPSMLC30_N051E013_DSM.tiff  ALPSMLC30_N067E012_DSM.tiff
+ALPSMLC30_N035W114_DSM.tiff  ALPSMLC30_N043E007_DSM.tiff  ALPSMLC30_N051E014_DSM.tiff  ALPSMLC30_N067E013_DSM.tiff
+ALPSMLC30_N035W116_DSM.tiff  ALPSMLC30_N043E008_DSM.tiff  ALPSMLC30_N051E015_DSM.tiff  ALPSMLC30_N067E014_DSM.tiff
+ALPSMLC30_N035W118_DSM.tiff  ALPSMLC30_N043E009_DSM.tiff  ALPSMLC30_N051W010_DSM.tiff  ALPSMLC30_N067E015_DSM.tif
 
 
-def _download_file(url: str, local_file: Path) -> Path:
-    request.urlretrieve(url, local_file)
-    return local_file
+
+the input item need to be generated in order to skip the Client request. The item needs an id and the ID is e.g. ALPSMLC30_N067E015_DSM (without tiff)
+the id needs to be generated from the coordinates bbox, so it might have 2 items, such as ALPSMLC30_N047W123_DSM and ALPSMLC30_N047W122_DSM
+for this input: bbox = [-122.2751, 47.5469, -121.9613, 47.7458].
 
 
-def _bbox(coord_list):
-    box = []
-    for i in (0, 1):
-        res = sorted(coord_list, key=lambda x: x[i])
-        box.append((res[0][i], res[-1][i]))
-    return [box[0][0], box[1][0], box[0][1], box[1][1]]
-
-
-def _turn_geojson_into_bbox(geojson_bbox: dict) -> List[float]:
-    coordinates = geojson_bbox["coordinates"]
-    return _bbox(list(geojson.utils.coords(geojson.Polygon(coordinates))))
-
-
+current code:
 def _get_tiff_file(stac_item: Item, allow_caching: bool, cache_dir: Path, count: int, max: int) -> Path:
     tiff = cache_dir / f"{stac_item.id}.tiff"
     if tiff.is_file() and allow_caching:
@@ -63,28 +47,7 @@ def fetch_stac_items_for_bbox(
     else:
         raise NoSTACItemFound("Could not find the desired STAC item for the given bounding box.")
 
-
-def fetch_stac_items_for_bbox_custom(
-    geojson: dict, allow_caching: bool, cache_dir: Path, progress_bar: Union[None, ProgressBar] = None
-) -> List[Path]:
-    bbox = _turn_geojson_into_bbox(geojson)
-    #client = Client.open(conf.PLANETARY_COMPUTER_API_URL, ignore_conformance=True)
-    #search = client.search(collections=[conf.PLANETARY_COMPUTER_COLLECTION], bbox=bbox)
-    #items = list(search.items())
-    items = generate_stac_items_custom(bbox)
-    n = len(items)
-    if progress_bar:
-        progress_bar.steps += n
-    if n > 0:
-        log.info(f"⬇️  fetching {n} stac items...")
-        files = []
-        for cnt, item in enumerate(items):
-            files.append(_get_tiff_file(item, allow_caching, cache_dir, cnt + 1, n))
-            if progress_bar:
-                progress_bar.step()
-        return files
-    else:
-        raise NoSTACItemFound("Could not find the desired STAC item for the given bounding box.")
+"""
 
 
 def generate_stac_items_custom(bbox: list[float]) -> list[Item]:
@@ -104,3 +67,24 @@ def generate_stac_items_custom(bbox: list[float]) -> list[Item]:
             )
             items.append(item)
     return items
+"""
+# Example usage
+bbox = [-122.2751, 47.5469, -121.9613, 47.7458]
+stac_items = generate_stac_items(bbox)
+for item in stac_items:
+    print(item)
+"""
+
+
+
+convert_bbox_to_stl(
+            bbox_geometry=bbox,
+            output_file="",  # There was error in the older version on deployment with wrong paths
+            model_size=100,
+            z_offset=0,  # Offset on bottom
+            z_scale=1,
+            max_res=False,
+            compress=False,
+            allow_caching=True,
+            cache_dir="/tmp"
+        )

@@ -17,7 +17,7 @@ from mapa.raster import (
     remove_empty_first_and_last_rows_and_cols,
     tiff_to_array,
 )
-from mapa.stac import fetch_stac_items_for_bbox
+from mapa.stac import fetch_stac_items_for_bbox, fetch_stac_items_for_bbox_custom
 from mapa.stl_file import save_to_stl_file
 from mapa.tiling import get_x_y_from_tiles_format, split_array_into_tiles
 from mapa.utils import TMPDIR, ProgressBar, path_to_clipped_tiff
@@ -111,7 +111,7 @@ def _fetch_merge_and_clip_tiffs(
     cache_dir: Path,
     progress_bar: Union[None, ProgressBar] = None,
 ) -> Path:
-    tiffs = fetch_stac_items_for_bbox(bbox_geojson, allow_caching, cache_dir, progress_bar)
+    tiffs = fetch_stac_items_for_bbox_custom(bbox_geojson, allow_caching, cache_dir, progress_bar)
     if len(tiffs) > 1:
         merged_tiff = merge_tiffs(tiffs, bbox_hash, cache_dir)
     else:
