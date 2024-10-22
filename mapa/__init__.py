@@ -210,23 +210,29 @@ def convert_bbox_to_stl(
     if progress_bar:
         steps = tiles.x * tiles.y * 2 if compress else tiles.x * tiles.y
         progress_bar = ProgressBar(progress_bar=progress_bar, steps=steps)
-
+    log.info(f"----1-----")
     path_to_tiff = _get_tiff_for_bbox(bbox_geometry, allow_caching, Path(cache_dir), progress_bar)
+    log.info(f"----2-----")
     tiff = rio.open(path_to_tiff)
+    log.info(f"----3-----")
     elevation_scale = determine_elevation_scale(tiff, model_size)
+    log.info(f"----4-----")
     array = tiff_to_array(tiff)
+    log.info(f"----5-----")
     if ensure_squared:
         array = cut_array_to_square(array)
-
+    log.info(f"----6-----")
     desired_size = _get_desired_size(
         array=array,
         x=model_size / tiles.x,
         y=model_size / tiles.y,
         ensure_squared=ensure_squared,
     )
-
+    log.info(f"----7-----") 
     tiled_arrays = split_array_into_tiles(array, tiles)
+    log.info(f"----8-----") 
     stl_files = []
+    log.info(f"----9-----") 
     for i, array in enumerate(tiled_arrays):
         stl_files.append(
             convert_array_to_stl(
