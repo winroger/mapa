@@ -18,6 +18,7 @@ def path_to_merged_tiff(bbox_hash: str, cache_dir: Path) -> Path:
 
 
 def path_to_clipped_tiff(bbox_hash: str, cache_dir: Path) -> Path:
+    log.info(f"----1.3.1-----")
     return cache_dir / f"clipped_{bbox_hash}.tiff"
 
 

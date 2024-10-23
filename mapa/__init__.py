@@ -122,11 +122,16 @@ def _fetch_merge_and_clip_tiffs(
 def _get_tiff_for_bbox(
     bbox_geojson: dict, allow_caching: bool, cache_dir: Path, progress_bar: Union[None, ProgressBar] = None
 ) -> Path:
+    log.info(f"----1.1-----")
     bbox_hash = get_hash_of_geojson(bbox_geojson)
+    log.info("bbox_hash: " + bbox_hash)
+    log.info(f"----1.2-----")
     if tiff_for_bbox_is_cached(bbox_hash, cache_dir) and allow_caching:
+        log.info(f"----1.3-----")
         log.info("🚀  using cached tiff!")
         return path_to_clipped_tiff(bbox_hash, cache_dir)
     else:
+        log.info(f"----1.4-----")
         return _fetch_merge_and_clip_tiffs(bbox_geojson, bbox_hash, allow_caching, cache_dir, progress_bar)
 
 

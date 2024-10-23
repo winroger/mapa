@@ -70,10 +70,10 @@ def fetch_stac_items_for_bbox_custom(
     geojson: dict, allow_caching: bool, cache_dir: Path, progress_bar: Union[None, ProgressBar] = None
 ) -> List[Path]:
     bbox = _turn_geojson_into_bbox(geojson)
-    #client = Client.open(conf.PLANETARY_COMPUTER_API_URL, ignore_conformance=True)
-    #search = client.search(collections=[conf.PLANETARY_COMPUTER_COLLECTION], bbox=bbox)
-    #items = list(search.items())
-    items = generate_stac_items_custom(bbox)
+    client = Client.open(conf.PLANETARY_COMPUTER_API_URL, ignore_conformance=True)
+    search = client.search(collections=[conf.PLANETARY_COMPUTER_COLLECTION], bbox=bbox)
+    items = list(search.items())
+    #items = generate_stac_items_custom(bbox)
     n = len(items)
     if progress_bar:
         progress_bar.steps += n
