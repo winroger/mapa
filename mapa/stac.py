@@ -101,7 +101,7 @@ def generate_stac_items_custom(bbox: list[float]) -> list[Item]:
                 id=item_id,
                 geometry=None,
                 bbox=bbox,
-                datetime=datetime.utcnow(),
+                datetime=datetime.datetime.now(),
                 properties={}
             )
             items.append(item)
