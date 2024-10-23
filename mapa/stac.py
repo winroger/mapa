@@ -11,6 +11,8 @@ from mapa import conf
 from mapa.exceptions import NoSTACItemFound
 from mapa.utils import ProgressBar
 
+import datetime
+
 log = logging.getLogger(__name__)
 
 
@@ -99,7 +101,7 @@ def generate_stac_items_custom(bbox: list[float]) -> list[Item]:
                 id=item_id,
                 geometry=None,
                 bbox=bbox,
-                datetime=None,
+                datetime=datetime.utcnow(),
                 properties={}
             )
             items.append(item)
