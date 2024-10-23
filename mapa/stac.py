@@ -12,12 +12,25 @@ from mapa.exceptions import NoSTACItemFound
 from mapa.utils import ProgressBar
 
 import datetime
+import ssl
+
+import certifi
+
 
 log = logging.getLogger(__name__)
 
 
-def _download_file(url: str, local_file: Path) -> Path:
+def _download_file_old(url: str, local_file: Path) -> Path:
     request.urlretrieve(url, local_file)
+    return local_file
+
+def _download_file(url: str, local_file: Path) -> Path:
+    # Create an SSL context that includes the necessary CA certificates
+    context = ssl.create_default_context(cafile=certifi.where())
+    
+    # Use the custom SSL context to download the file
+    with request.urlopen(url, context=context) as response, open(local_file, 'wb') as out_file:
+        out_file.write(response.read())
     return local_file
 
 
@@ -70,10 +83,10 @@ def fetch_stac_items_for_bbox_custom(
     geojson: dict, allow_caching: bool, cache_dir: Path, progress_bar: Union[None, ProgressBar] = None
 ) -> List[Path]:
     bbox = _turn_geojson_into_bbox(geojson)
-    client = Client.open(conf.PLANETARY_COMPUTER_API_URL, ignore_conformance=True)
-    search = client.search(collections=[conf.PLANETARY_COMPUTER_COLLECTION], bbox=bbox)
-    items = list(search.items())
-    #items = generate_stac_items_custom(bbox)
+    #client = Client.open(conf.PLANETARY_COMPUTER_API_URL, ignore_conformance=True)
+    #search = client.search(collections=[conf.PLANETARY_COMPUTER_COLLECTION], bbox=bbox)
+    #items = list(search.items())
+    items = generate_stac_items_custom(bbox)
     n = len(items)
     if progress_bar:
         progress_bar.steps += n

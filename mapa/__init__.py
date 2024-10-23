@@ -111,11 +111,14 @@ def _fetch_merge_and_clip_tiffs(
     cache_dir: Path,
     progress_bar: Union[None, ProgressBar] = None,
 ) -> Path:
-    tiffs = fetch_stac_items_for_bbox_custom(bbox_geojson, allow_caching, cache_dir, progress_bar)
+    tiffs = fetch_stac_items_for_bbox(bbox_geojson, allow_caching, cache_dir, progress_bar)
+    log.info(f"----1.4.1-----")
     if len(tiffs) > 1:
         merged_tiff = merge_tiffs(tiffs, bbox_hash, cache_dir)
+        log.info(f"----1.4.2-----")
     else:
         merged_tiff = tiffs[0]
+        log.info(f"----1.4.3-----")
     return clip_tiff_to_bbox(merged_tiff, bbox_geojson, bbox_hash, cache_dir)
 
 
