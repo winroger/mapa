@@ -26,6 +26,8 @@ def _download_file_old(url: str, local_file: Path) -> Path:
 
 def _download_file(url: str, local_file: Path) -> Path:
     log.info(f"----1.5.1-----")
+    log.info("local_file: ", local_file)
+    log.info("url: ", url)
     # Create an SSL context that includes the necessary CA certificates
     context = ssl.create_default_context(cafile=certifi.where())
     log.info(f"----1.5.2-----")
