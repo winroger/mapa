@@ -25,12 +25,14 @@ def _download_file_old(url: str, local_file: Path) -> Path:
     return local_file
 
 def _download_file(url: str, local_file: Path) -> Path:
+    log.info(f"----1.4.1-----")
     # Create an SSL context that includes the necessary CA certificates
     context = ssl.create_default_context(cafile=certifi.where())
-    
+    log.info(f"----1.4.2-----")
     # Use the custom SSL context to download the file
     with request.urlopen(url, context=context) as response, open(local_file, 'wb') as out_file:
         out_file.write(response.read())
+    log.info(f"----1.4.3-----")
     return local_file
 
 
