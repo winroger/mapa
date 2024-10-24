@@ -41,13 +41,13 @@ def _download_file_try2(url: str, local_file: Path) -> Path:
 
 def _download_file(url: str, local_file: Path) -> Path:
     log.info(f"----1.5.1-----")
-    planetary_computer.sign(url)
     # Create an SSL context that includes the necessary CA certificates
     context = ssl.create_default_context(cafile=certifi.where())
     log.info(f"----1.5.2-----")
+    signed_url = planetary_computer.sign(url)
     # Use the custom SSL context to download the file#
     log.info(f"Downloading from URL: {url}")
-    with request.urlopen(url, context=context) as response, open(local_file, 'wb') as out_file:
+    with request.urlopen(signed_url, context=context) as response, open(local_file, 'wb') as out_file:
         log.info(f"----1.5.2.X----")
         out_file.write(response.read())
     log.info(f"----1.5.3-----")
