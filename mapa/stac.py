@@ -23,8 +23,7 @@ import certifi
 log = logging.getLogger(__name__)
 
 
-def _download_file(url: str, local_file: Path) -> Path:
-    signed_url = planetary_computer.sign(url)
+def _download_file_old(url: str, local_file: Path) -> Path:
     request.urlretrieve(signed_url, local_file)
     return local_file
 
@@ -40,7 +39,7 @@ def _download_file_try2(url: str, local_file: Path) -> Path:
 
     return local_file
 
-def _download_file_fixed(url: str, local_file: Path) -> Path:
+def _download_file(url: str, local_file: Path) -> Path:
     context = ssl.create_default_context(cafile=certifi.where())
     signed_url = planetary_computer.sign(url)
     log.info(f"Downloading from URL: {url}")
