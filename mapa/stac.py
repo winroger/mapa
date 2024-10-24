@@ -11,11 +11,26 @@ from mapa import conf
 from mapa.exceptions import NoSTACItemFound
 from mapa.utils import ProgressBar
 
+import ssl
+import certifi
+import planetary_computer
+
 log = logging.getLogger(__name__)
 
 
-def _download_file(url: str, local_file: Path) -> Path:
+def _download_file_outdaten(url: str, local_file: Path) -> Path:
     request.urlretrieve(url, local_file)
+    return local_file
+
+def _download_file(url: str, local_file: Path) -> Path:
+    """
+    24.10.2024: Updated this one to make the ssl check and the signed url
+    """
+    context = ssl.create_default_context(cafile=certifi.where())
+    signed_url = planetary_computer.sign(url)
+    log.info(f"Downloading from URL: {url}")
+    with request.urlopen(signed_url, context=context) as response, open(local_file, 'wb') as out_file:
+        out_file.write(response.read())
     return local_file
 
 
