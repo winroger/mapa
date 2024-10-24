@@ -8,6 +8,8 @@ from pystac.item import Item
 from pystac_client import Client
 import requests
 
+import planetary_computer
+
 from mapa import conf
 from mapa.exceptions import NoSTACItemFound
 from mapa.utils import ProgressBar
@@ -21,11 +23,12 @@ import certifi
 log = logging.getLogger(__name__)
 
 
-def _download_file_old(url: str, local_file: Path) -> Path:
+def _download_file(url: str, local_file: Path) -> Path:
+    planetary_computer.sign(url)
     request.urlretrieve(url, local_file)
     return local_file
 
-def _download_file(url: str, local_file: Path) -> Path:
+def _download_file_try2(url: str, local_file: Path) -> Path:
     log.info(f"Downloading from URL: {url}")
     response = requests.get(url)
     log.info(f"XXXXXXXXXXXXX")
