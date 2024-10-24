@@ -28,9 +28,13 @@ def _download_file_old(url: str, local_file: Path) -> Path:
 def _download_file(url: str, local_file: Path) -> Path:
     log.info(f"Downloading from URL: {url}")
     response = requests.get(url)
+    log.info(f"XXXXXXXXXXXXX")
     response.raise_for_status()  # Raise an error for bad status codes
+    log.info(f"AAAAAAAAAAAAA")
     with open(local_file, 'wb') as f:
         f.write(response.content)
+        log.info(f"BBBBBBBBBBBBBB")
+
     return local_file
 
 def _download_file_try1(url: str, local_file: Path) -> Path:
