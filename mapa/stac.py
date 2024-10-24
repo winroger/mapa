@@ -31,6 +31,7 @@ def _download_file(url: str, local_file: Path) -> Path:
     log.info(f"----1.5.2-----")
     # Use the custom SSL context to download the file
     with request.urlopen(url, context=context) as response, open(local_file, 'wb') as out_file:
+        log.info(f"----1.5.2.X----")
         out_file.write(response.read())
     log.info(f"----1.5.3-----")
     return local_file
