@@ -25,14 +25,14 @@ def _download_file_old(url: str, local_file: Path) -> Path:
     return local_file
 
 def _download_file(url: str, local_file: Path) -> Path:
-    log.info(f"----1.4.1-----")
+    log.info(f"----1.5.1-----")
     # Create an SSL context that includes the necessary CA certificates
     context = ssl.create_default_context(cafile=certifi.where())
-    log.info(f"----1.4.2-----")
+    log.info(f"----1.5.2-----")
     # Use the custom SSL context to download the file
     with request.urlopen(url, context=context) as response, open(local_file, 'wb') as out_file:
         out_file.write(response.read())
-    log.info(f"----1.4.3-----")
+    log.info(f"----1.5.3-----")
     return local_file
 
 
@@ -50,11 +50,15 @@ def _turn_geojson_into_bbox(geojson_bbox: dict) -> List[float]:
 
 
 def _get_tiff_file(stac_item: Item, allow_caching: bool, cache_dir: Path, count: int, max: int) -> Path:
+    log.info(f"----1.8.1-----") 
     tiff = cache_dir / f"{stac_item.id}.tiff"
+    log.info(f"----1.8.2-----")
     if tiff.is_file() and allow_caching:
+        log.info(f"----1.8.3-----")
         log.info(f"🚀  {count}/{max} using cached stac item {stac_item.id}")
         return tiff
     else:
+        log.info(f"----1.8.4-----")
         log.info(f"🏞  {count}/{max} downloading stac item {stac_item.id}")
         return _download_file(stac_item.assets["data"].href, tiff)
 
@@ -62,20 +66,29 @@ def _get_tiff_file(stac_item: Item, allow_caching: bool, cache_dir: Path, count:
 def fetch_stac_items_for_bbox(
     geojson: dict, allow_caching: bool, cache_dir: Path, progress_bar: Union[None, ProgressBar] = None
 ) -> List[Path]:
+    log.info(f"----1.6.1-----") 
     bbox = _turn_geojson_into_bbox(geojson)
+    log.info(f"----1.6.2-----") 
     client = Client.open(conf.PLANETARY_COMPUTER_API_URL, ignore_conformance=True)
+    log.info(f"----1.6.3-----") 
     search = client.search(collections=[conf.PLANETARY_COMPUTER_COLLECTION], bbox=bbox)
+    log.info(f"----1.6.4-----") 
     items = list(search.items())
+    log.info(f"----1.6.5-----") 
     n = len(items)
+
     if progress_bar:
         progress_bar.steps += n
     if n > 0:
+        log.info(f"----1.6.6-----") 
         log.info(f"⬇️  fetching {n} stac items...")
         files = []
+        log.info(f"----1.6.7-----") 
         for cnt, item in enumerate(items):
             files.append(_get_tiff_file(item, allow_caching, cache_dir, cnt + 1, n))
             if progress_bar:
                 progress_bar.step()
+        log.info(f"----1.6.8-----") 
         return files
     else:
         raise NoSTACItemFound("Could not find the desired STAC item for the given bounding box.")

@@ -111,6 +111,7 @@ def _fetch_merge_and_clip_tiffs(
     cache_dir: Path,
     progress_bar: Union[None, ProgressBar] = None,
 ) -> Path:
+    log.info(f"----1.4.0-----")
     tiffs = fetch_stac_items_for_bbox(bbox_geojson, allow_caching, cache_dir, progress_bar)
     log.info(f"----1.4.1-----")
     if len(tiffs) > 1:
