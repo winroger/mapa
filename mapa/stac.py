@@ -6,6 +6,7 @@ from urllib import request
 import geojson
 from pystac.item import Item
 from pystac_client import Client
+import requests
 
 from mapa import conf
 from mapa.exceptions import NoSTACItemFound
@@ -25,6 +26,14 @@ def _download_file_old(url: str, local_file: Path) -> Path:
     return local_file
 
 def _download_file(url: str, local_file: Path) -> Path:
+    log.info(f"Downloading from URL: {url}")
+    response = requests.get(url)
+    response.raise_for_status()  # Raise an error for bad status codes
+    with open(local_file, 'wb') as f:
+        f.write(response.content)
+    return local_file
+
+def _download_file_try1(url: str, local_file: Path) -> Path:
     log.info(f"----1.5.1-----")
     log.info("local_file: ", local_file)
     log.info("url: ", url)
@@ -58,6 +67,7 @@ def _get_tiff_file(stac_item: Item, allow_caching: bool, cache_dir: Path, count:
     log.info(f"----1.8.2-----")
     if tiff.is_file() and allow_caching:
         log.info(f"----1.8.3-----")
+        log.info(f"tiff: ", tiff)
         log.info(f"🚀  {count}/{max} using cached stac item {stac_item.id}")
         return tiff
     else:
