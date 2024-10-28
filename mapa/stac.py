@@ -15,6 +15,7 @@ import ssl
 import certifi
 import planetary_computer
 import time
+import datetime
 
 log = logging.getLogger(__name__)
 
@@ -132,7 +133,7 @@ def get_stac_items_from_bbox(bbox: list[float]) -> list[Item]:
                 id=item_id,
                 geometry=None,
                 bbox=bbox,
-                datetime= None,
+                datetime= datetime.datetime.now(datetime.timezone.utc),
                 properties={}
             )
             items.append(item)
