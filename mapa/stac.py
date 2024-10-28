@@ -100,6 +100,7 @@ def fetch_stac_items_for_bbox_custom(
             else:
                 log.info(f"🏞  {cnt + 1}/{n} downloading stac item {item.id}")
                 stac_items = get_stac_items_from_api(bbox)
+                print("created stac items from api")
                 files.append(_download_file(stac_items[cnt].assets["data"].href, tiff))
             if progress_bar:
                 progress_bar.step()
@@ -131,7 +132,7 @@ def get_stac_items_from_bbox(bbox: list[float]) -> list[Item]:
                 id=item_id,
                 geometry=None,
                 bbox=bbox,
-                datetime=None,
+                datetime= None,
                 properties={}
             )
             items.append(item)
