@@ -14,6 +14,7 @@ from mapa.utils import ProgressBar
 import ssl
 import certifi
 import planetary_computer
+import time
 
 log = logging.getLogger(__name__)
 
@@ -24,7 +25,8 @@ def _download_file_outdaten(url: str, local_file: Path) -> Path:
 
 def _download_file(url: str, local_file: Path) -> Path:
     """
-    24.10.2024: Updated this one to make the ssl check and the signed url
+    24.10.2024: Updated this one to make the ssl check and the signed url.
+    See: https://planetarycomputer.microsoft.com/docs/concepts/sas/#rate-limits-and-access-restrictions
     """
     context = ssl.create_default_context(cafile=certifi.where())
     signed_url = planetary_computer.sign(url)
@@ -83,26 +85,41 @@ def fetch_stac_items_for_bbox_custom(
     geojson: dict, allow_caching: bool, cache_dir: Path, progress_bar: Union[None, ProgressBar] = None
 ) -> List[Path]:
     bbox = _turn_geojson_into_bbox(geojson)
-    #client = Client.open(conf.PLANETARY_COMPUTER_API_URL, ignore_conformance=True)
-    #search = client.search(collections=[conf.PLANETARY_COMPUTER_COLLECTION], bbox=bbox)
-    #items = list(search.items())
-    items = generate_stac_items_custom(bbox)
-    n = len(items)
+    items_custom = get_stac_items_from_bbox(bbox)
+    n = len(items_custom)
     if progress_bar:
         progress_bar.steps += n
     if n > 0:
         log.info(f"⬇️  fetching {n} stac items...")
         files = []
-        for cnt, item in enumerate(items):
-            files.append(_get_tiff_file(item, allow_caching, cache_dir, cnt + 1, n))
+        for cnt, item in enumerate(items_custom):
+            tiff = cache_dir / f"{item.id}.tiff"
+            if tiff.is_file() and allow_caching:
+                log.info(f"🚀  {cnt + 1}/{n} using cached stac item {item.id}")
+                files.append(tiff)
+            else:
+                log.info(f"🏞  {cnt + 1}/{n} downloading stac item {item.id}")
+                stac_items = get_stac_items_from_api(bbox)
+                files.append(_download_file(stac_items[cnt].assets["data"].href, tiff))
             if progress_bar:
                 progress_bar.step()
         return files
     else:
         raise NoSTACItemFound("Could not find the desired STAC item for the given bounding box.")
 
+def get_stac_items_from_api(bbox: list[float]) -> list[Item]:
+    start_time = time.time()
+    client = Client.open(conf.PLANETARY_COMPUTER_API_URL, ignore_conformance=True)
+    search = client.search(collections=[conf.PLANETARY_COMPUTER_COLLECTION], bbox=bbox)
+    items = list(search.items())
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    log.info(f"Request took {elapsed_time:.2f} seconds")
+    print(f"returning {len(items)} stac items")
+    return items
 
-def generate_stac_items_custom(bbox: list[float]) -> list[Item]:
+
+def get_stac_items_from_bbox(bbox: list[float]) -> list[Item]:
     min_lon, min_lat, max_lon, max_lat = bbox
     items = []
     for lon in range(int(min_lon), int(max_lon) + 1):
@@ -118,4 +135,5 @@ def generate_stac_items_custom(bbox: list[float]) -> list[Item]:
                 properties={}
             )
             items.append(item)
+    print(f"returning {len(items)} custom items")
     return items
