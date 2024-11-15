@@ -98,6 +98,7 @@ def fetch_stac_items_for_bbox_custom(
         else:
             log.info(f"item not cached: {item.id}")
             items_custom = get_stac_items_from_api(bbox)
+            break
  
 
     ##############
