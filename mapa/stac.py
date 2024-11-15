@@ -17,6 +17,8 @@ import planetary_computer
 import time
 import datetime
 
+import math
+
 log = logging.getLogger(__name__)
 
 
