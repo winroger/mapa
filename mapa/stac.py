@@ -139,8 +139,8 @@ def get_stac_items_from_api(bbox: list[float]) -> list[Item]:
 def get_stac_items_from_bbox(bbox: list[float]) -> list[Item]:
     min_lon, min_lat, max_lon, max_lat = bbox
     items = []
-    for lon in range(int(min_lon), int(max_lon) + 1):
-        for lat in range(int(min_lat), int(max_lat) + 1):
+    for lon in range(int(abs(min_lon)), int(abs(max_lon)) + 1):
+        for lat in range(int(abs(min_lat)), int(abs(max_lat)) + 1):
             lon_prefix = 'E' if lon >= 0 else 'W'
             lat_prefix = 'N' if lat >= 0 else 'S'
             item_id = f"ALPSMLC30_{lat_prefix}{abs(lat):03d}{lon_prefix}{abs(lon):03d}_DSM"
@@ -148,7 +148,7 @@ def get_stac_items_from_bbox(bbox: list[float]) -> list[Item]:
                 id=item_id,
                 geometry=None,
                 bbox=bbox,
-                datetime= datetime.datetime.now(datetime.timezone.utc),
+                datetime=datetime.datetime.now(datetime.timezone.utc),
                 properties={}
             )
             items.append(item)
