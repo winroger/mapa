@@ -87,6 +87,20 @@ def fetch_stac_items_for_bbox_custom(
 ) -> List[Path]:
     bbox = _turn_geojson_into_bbox(geojson)
     items_custom = get_stac_items_from_bbox(bbox)
+
+
+
+    ###### Check for each item in items custom if it is already in the cache
+    for item in items_custom:
+        tiff = cache_dir / f"{item.id}.tiff"
+        if tiff.is_file() and allow_caching:
+            log.info(f"item cached: {item.id}")
+        else:
+            log.info(f"item not cached: {item.id}")
+            items_custom = get_stac_items_from_api(bbox)
+ 
+
+    ##############
     n = len(items_custom)
     if progress_bar:
         progress_bar.steps += n
@@ -95,14 +109,15 @@ def fetch_stac_items_for_bbox_custom(
         files = []
         for cnt, item in enumerate(items_custom):
             tiff = cache_dir / f"{item.id}.tiff"
+            print(f"Looking for {tiff}")
             if tiff.is_file() and allow_caching:
                 log.info(f"🚀  {cnt + 1}/{n} using cached stac item {item.id}")
                 files.append(tiff)
             else:
                 log.info(f"🏞  {cnt + 1}/{n} downloading stac item {item.id}")
-                stac_items = get_stac_items_from_api(bbox)
-                print("created stac items from api")
-                files.append(_download_file(stac_items[cnt].assets["data"].href, tiff))
+                #stac_items = get_stac_items_from_api(bbox)
+                #print("created stac items from api")
+                files.append(_download_file(items_custom[cnt].assets["data"].href, tiff))
             if progress_bar:
                 progress_bar.step()
         return files
