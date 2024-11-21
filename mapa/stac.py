@@ -143,13 +143,13 @@ def get_stac_items_from_bbox(bbox: list[float]) -> list[Item]:
     min_lon, min_lat, max_lon, max_lat = bbox
     items = []
 
-        # Use math.floor for negative values and math.ceil for positive values
-    min_lon = math.floor(min_lon) if min_lon < 0 else math.ceil(min_lon)
-    max_lon = math.floor(max_lon) if max_lon < 0 else math.ceil(max_lon)
-    min_lat = math.floor(min_lat) if min_lat < 0 else math.ceil(min_lat)
-    max_lat = math.floor(max_lat) if max_lat < 0 else math.ceil(max_lat)
+    # math.floor(value) returns the smaller integer 
+    min_lon = math.floor(min_lon)
+    max_lon = math.floor(max_lon)
+    min_lat = math.floor(min_lat)
+    max_lat = math.floor(max_lat)
     
-
+    # Create a list of items for each lon/lat int combination
     for lon in range(min_lon, max_lon + 1):
         for lat in range(min_lat, max_lat + 1):
             lon_prefix = 'E' if lon >= 0 else 'W'
