@@ -88,29 +88,28 @@ def fetch_stac_items_for_bbox_custom(
     geojson: dict, allow_caching: bool, cache_dir: Path, progress_bar: Union[None, ProgressBar] = None
 ) -> List[Path]:
     bbox = _turn_geojson_into_bbox(geojson)
-    items_custom = get_stac_items_from_bbox(bbox)
+    items = get_custom_items_from_bbox(bbox)
 
 
 
     ###### Check for each item in items custom if it is already in the cache
-    for item in items_custom:
+    for item in items:
         tiff = cache_dir / f"{item.id}.tiff"
         if tiff.is_file() and allow_caching:
             log.info(f"item cached: {item.id}")
         else:
             log.info(f"item not cached: {item.id}")
-            items_custom = get_stac_items_from_api(bbox)
+            items = get_stac_items_from_api(bbox)
             break
  
-
     ##############
-    n = len(items_custom)
+    n = len(items)
     if progress_bar:
         progress_bar.steps += n
     if n > 0:
         log.info(f"⬇️  fetching {n} stac items...")
         files = []
-        for cnt, item in enumerate(items_custom):
+        for cnt, item in enumerate(items):
             tiff = cache_dir / f"{item.id}.tiff"
             print(f"Looking for {tiff}")
             if tiff.is_file() and allow_caching:
@@ -120,7 +119,7 @@ def fetch_stac_items_for_bbox_custom(
                 log.info(f"🏞  {cnt + 1}/{n} downloading stac item {item.id}")
                 #stac_items = get_stac_items_from_api(bbox)
                 #print("created stac items from api")
-                files.append(_download_file(items_custom[cnt].assets["data"].href, tiff))
+                files.append(_download_file(items[cnt].assets["data"].href, tiff))
             if progress_bar:
                 progress_bar.step()
         return files
@@ -139,17 +138,16 @@ def get_stac_items_from_api(bbox: list[float]) -> list[Item]:
     return items
 
 
-def get_stac_items_from_bbox(bbox: list[float]) -> list[Item]:
+def get_custom_items_from_bbox(bbox: list[float]) -> list[Item]:
     min_lon, min_lat, max_lon, max_lat = bbox
     items = []
-
-    # math.floor(value) returns the smaller integer 
+    
+# math.floor(value) returns the smaller integer 
     min_lon = math.floor(min_lon)
     max_lon = math.floor(max_lon)
     min_lat = math.floor(min_lat)
     max_lat = math.floor(max_lat)
-    
-    # Create a list of items for each lon/lat int combination
+
     for lon in range(min_lon, max_lon + 1):
         for lat in range(min_lat, max_lat + 1):
             lon_prefix = 'E' if lon >= 0 else 'W'
@@ -163,5 +161,5 @@ def get_stac_items_from_bbox(bbox: list[float]) -> list[Item]:
                 properties={}
             )
             items.append(item)
-    print(f"returning {len(items)} custom items")
+   # print(f"returning {len(items)} custom items")
     return items
