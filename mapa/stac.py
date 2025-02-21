@@ -72,7 +72,7 @@ def fetch_stac_items_for_bbox(
     n = len(items)
     if progress_bar:
         progress_bar.steps += n
-    if n > 0:
+    if n > 0 and n < 5:
         log.info(f"⬇️  fetching {n} stac items...")
         files = []
         for cnt, item in enumerate(items):
