@@ -104,12 +104,9 @@ def fetch_stac_items_for_bbox_custom(
  
     ##############
     n = len(items)
-    if n > 4:
-        log.info("Too many items, quitting the operation.")
-        return []
     if progress_bar:
         progress_bar.steps += n
-    if n > 0:
+    if n > 0 and n < 5:
         log.info(f"⬇️  fetching {n} stac items...")
         files = []
         for cnt, item in enumerate(items):
